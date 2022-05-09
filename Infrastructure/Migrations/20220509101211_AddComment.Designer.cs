@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220505090027_CreateInitial")]
-    partial class CreateInitial
+    [Migration("20220509101211_AddComment")]
+    partial class AddComment
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,6 +23,31 @@ namespace Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("Domain.Entities.Comment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TopicId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TopicId");
+
+                    b.ToTable("Comments");
+                });
 
             modelBuilder.Entity("Domain.Entities.Segment", b =>
                 {
@@ -77,18 +102,36 @@ namespace Infrastructure.Migrations
                     b.ToTable("Topics");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Comment", b =>
+                {
+                    b.HasOne("Domain.Entities.Topic", "Topic")
+                        .WithMany("Comments")
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Topic");
+                });
+
             modelBuilder.Entity("Domain.Entities.Topic", b =>
                 {
-                    b.HasOne("Domain.Entities.Segment", null)
+                    b.HasOne("Domain.Entities.Segment", "Segment")
                         .WithMany("Topics")
                         .HasForeignKey("SegmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Segment");
                 });
 
             modelBuilder.Entity("Domain.Entities.Segment", b =>
                 {
                     b.Navigation("Topics");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Topic", b =>
+                {
+                    b.Navigation("Comments");
                 });
 #pragma warning restore 612, 618
         }

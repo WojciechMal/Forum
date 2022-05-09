@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220505105125_RelationSegTop")]
-    partial class RelationSegTop
+    [Migration("20220506142111_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -79,8 +79,8 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Topic", b =>
                 {
-                    b.HasOne("Domain.Entities.Segment", "Segment")
-                        .WithMany("Topics")
+                    b.HasOne("Domain.Entities.Segment", null)
+                        .WithMany()
                         .HasForeignKey("SegmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

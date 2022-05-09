@@ -1,8 +1,10 @@
 using Infrastructure.Persistance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Add services to the container.
 

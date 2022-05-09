@@ -15,6 +15,7 @@ namespace MyForum.Controllers
         {
             _context = context;
         }
+
         //private static List<Topic> topics = new List<Topic>
         //    {
         //       new Topic {
@@ -105,30 +106,47 @@ namespace MyForum.Controllers
         [HttpGet]
         public List<Topic> GetTopics()
         {
-            return _context.Topics.ToList();
+            List<Topic> topics = new List<Topic>();
+            foreach (var top in _context.Topics)
+            {
+                top.Comments = _context.Comments.Where(t => t.TopicId == top.Id).ToList();
+                topics.Add(top);
+            }
+            return topics;
         }
 
         [HttpGet("{id}")]
-        public Topic? GetTopic(int id)
+        public Topic? GetTopicById(int id)
         {
-            return _context.Topics.Find(id);
+
+            Topic? topic = _context.Topics.Find(id);
+            topic.Comments = _context.Comments.Where(t => t.TopicId == topic.Id).ToList();
+            return topic;
         }
 
         [HttpPost]
-        public void AddTopic(Topic top)
+        public void AddTopic(TopicDto top)
         {
-            _context.Topics.Add(top);
+            Segment segment = (Segment)_context.Segments.Where(s => s.Id == top.SegmentId).FirstOrDefault();
+            var newTopic = new Topic
+            {
+                Name = top.Name,
+                Description = top.Description,
+                SegmentId = segment.Id,
+                Created = DateTime.Now
+            };
+            _context.Topics.Add(newTopic);
             _context.SaveChanges();
         }
 
+        
+
         [HttpPut]
-        public void UpdateTopic(Topic request)
+        public void UpdateTopic(TopicDto request)
         {
             var topic = _context.Topics.Find(request.Id);
-
             topic.Name = request.Name;
             topic.Description = request.Description;
-
             _context.SaveChanges();
         }
 
@@ -142,6 +160,5 @@ namespace MyForum.Controllers
             _context.SaveChanges();
         }
 
-    };
-}
+    }}
 

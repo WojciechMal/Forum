@@ -22,6 +22,31 @@ namespace Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("Domain.Entities.Comment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TopicId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TopicId");
+
+                    b.ToTable("Comments");
+                });
+
             modelBuilder.Entity("Domain.Entities.Segment", b =>
                 {
                     b.Property<int>("Id")
@@ -43,7 +68,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Segments", (string)null);
+                    b.ToTable("Segments");
                 });
 
             modelBuilder.Entity("Domain.Entities.Topic", b =>
@@ -72,7 +97,18 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("SegmentId");
 
-                    b.ToTable("Topics", (string)null);
+                    b.ToTable("Topics");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Comment", b =>
+                {
+                    b.HasOne("Domain.Entities.Topic", "Topic")
+                        .WithMany("Comments")
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Topic");
                 });
 
             modelBuilder.Entity("Domain.Entities.Topic", b =>
@@ -89,6 +125,11 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Segment", b =>
                 {
                     b.Navigation("Topics");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Topic", b =>
+                {
+                    b.Navigation("Comments");
                 });
 #pragma warning restore 612, 618
         }

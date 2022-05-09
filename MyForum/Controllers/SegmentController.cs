@@ -3,6 +3,7 @@ using Infrastructure.Persistance;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
+
 namespace MyForum.Controllers
 {
     [Route("api/[controller]/[action]")]
@@ -79,24 +80,45 @@ namespace MyForum.Controllers
         [HttpGet]
         public List<Segment> GetSegments()
         {
-            return _context.Segments.ToList();
+            List<Segment> segments = new List<Segment>();
+            foreach (Segment sgm in _context.Segments)
+            {
+                sgm.Topics = _context.Topics.Where(t => t.SegmentId == sgm.Id).ToList();
+                foreach (Topic top in sgm.Topics)
+                {
+                    top.Comments = _context.Comments.Where(c => c.TopicId == top.Id).ToList();
+                }
+                segments.Add(sgm);
+            }
+            
+            return segments;
         }
 
         [HttpGet("{id}")]
         public Segment? GetSegment(int id)
         {
-            return _context.Segments.Find(id);
+            Segment? segment = _context.Segments.Find(id);
+            segment.Topics = _context.Topics.Where(t => t.SegmentId == segment.Id).ToList();
+            foreach (Topic top in segment.Topics)
+            {
+                top.Comments = _context.Comments.Where(c => c.TopicId == top.Id).ToList();
+            }
+            return segment;
         }
 
         [HttpPost]
-        public void AddSegment(Segment segm)
+        public void AddSegment(SegmentDto segm)
         {
-            _context.Segments.Add(segm);
+            var Segment = new Segment
+            {
+                Name = segm.Name,
+                Description = segm.Description
+            };
+            _context.Segments.Add(Segment);
             _context.SaveChanges();
         }
-
         [HttpPut]
-        public void UpdateSegment(Segment request)
+        public void UpdateSegment(SegmentDto request)
         {
             var segment = _context.Segments.Find(request.Id);
             
@@ -105,9 +127,6 @@ namespace MyForum.Controllers
 
             _context.SaveChanges();
         }
-
-        
-
         [HttpDelete("{id}")]
         public void DeleteSegment(int id)
         {

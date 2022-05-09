@@ -1,4 +1,6 @@
 ﻿using Domain.Common;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Domain.Entities
 {
@@ -6,8 +8,11 @@ namespace Domain.Entities
     {
         
         public int Id { get; set; }
-        public string? Name { get; set; } = string.Empty;
-        public string? Description { get; set; } = string.Empty;
-        public List<Topic>? Topics { get; set; } = new List<Topic>();
+        [Required]
+        public string Name { get; set; } 
+        [Required]
+        public string Description { get; set; } 
+        
+        public List<Topic>? Topics { get; set; } 
     }
 }
